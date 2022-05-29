@@ -17,6 +17,12 @@ export class Question {
   @Column('smallint')
   currentHint: number;
 
+  @Column('varchar')
+  imageUrl: string;
+
+  @Column('varchar')
+  answer: string;
+
   @OneToOne(() => User)
   @JoinColumn()
   user: User;

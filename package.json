@@ -28,11 +28,15 @@
     "@nestjs/core": "^7.5.5",
     "@nestjs/platform-express": "^7.5.5",
     "@nestjs/typeorm": "^7.1.5",
+    "@types/sharp": "^0.30.2",
+    "axios": "^0.27.2",
     "discord.js": "^13.7.0",
     "pg": "^8.7.3",
+    "pokeapi-typescript": "^2.1.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
+    "sharp": "^0.30.5",
     "typeorm": "^0.2.45"
   },
   "devDependencies": {
