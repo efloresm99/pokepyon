@@ -21,7 +21,7 @@ export class BotGateway {
   async onMessage(message: Message) {
     const response = await this.pokedexService.pokedexCommand(message);
     const responseString = typeof response === 'string';
-    if (responseString) return message.reply(response);
+    if (responseString) return response;
 
     return {
       files: [{ attachment: response, name: 'pokemon.png' }],

@@ -1,12 +1,27 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import axios from 'axios';
 import { IPokemon } from 'pokeapi-typescript';
 import * as sharp from 'sharp';
+import { Hint } from 'src/entities/hint.entity';
+import { Question } from 'src/entities/question.entity';
+import { User } from 'src/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionsService {
-  async getQuestion() {
+  user: User;
+
+  constructor(
+    @InjectRepository(Question)
+    private questionsRepository: Repository<Question>,
+    @InjectRepository(Hint)
+    private hintsRepository: Repository<Hint>,
+  ) {}
+
+  async getQuestion(user: User) {
+    this.user = user;
     const randomId = Math.ceil(Math.random() * 125);
 
     const pokeApi = require('pokeapi-typescript');
@@ -16,7 +31,12 @@ export class QuestionsService {
     const pokemonType = await this.getPokemonTypeSpanish(pokemon);
     const pokemonMove = await this.getPokemonMoveSpanish(pokemon);
     const pokemonName = pokemon.name.toLowerCase();
-    console.log(pokemonName, pokemonType, pokemonMove);
+    await this.saveQuestion(
+      pokemonName,
+      pokemonType,
+      pokemonMove,
+      pokeImageUrl,
+    );
     return pokemonImage;
   }
 
@@ -60,5 +80,33 @@ export class QuestionsService {
       (move) => move.language.name === 'es',
     )[0].name;
     return moveEs;
+  }
+
+  private async saveQuestion(
+    pokemonName: string,
+    pokemonType: string,
+    pokemonMove: string,
+    imageUrl: string,
+  ) {
+    const question = this.questionsRepository.create({
+      user: this.user,
+      currentHint: 0,
+      answer: pokemonName,
+      imageUrl,
+    });
+    const newQuestion = await this.questionsRepository.save(question);
+    const typeHint = this.hintsRepository.create({
+      question: newQuestion,
+      hintOrder: 1,
+      hintName: 'Type',
+      hintValue: pokemonType,
+    });
+    const moveHint = this.hintsRepository.create({
+      question: newQuestion,
+      hintOrder: 2,
+      hintName: 'Move',
+      hintValue: pokemonMove,
+    });
+    await this.hintsRepository.save([typeHint, moveHint]);
   }
 }

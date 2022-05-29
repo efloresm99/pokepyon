@@ -27,7 +27,7 @@ export class PokedexService {
     if (userHasUnansweredQuestion)
       return new RandomReply(pokedexReplies).finalMessage;
 
-    return await this.questionsService.getQuestion();
+    return await this.questionsService.getQuestion(user);
   }
 
   private async getActiveQuestions(user: User) {
