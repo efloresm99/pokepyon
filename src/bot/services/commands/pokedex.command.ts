@@ -1,6 +1,6 @@
 import { Message } from 'discord.js';
 
-export class PokedexCommand {
+export class PokepyonCommand {
   guildId: string;
   userId: string;
 

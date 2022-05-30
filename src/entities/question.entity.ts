@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
@@ -13,6 +14,9 @@ import { User } from './user.entity';
 export class Question {
   @PrimaryGeneratedColumn()
   questionId: number;
+
+  @CreateDateColumn()
+  askedOn: Date;
 
   @Column('smallint')
   currentHint: number;

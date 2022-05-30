@@ -6,7 +6,7 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { pokedexReplies } from '../replies/pokedex.replies';
 import { RandomReply } from '../util/random-message.util';
-import { PokedexCommand } from './commands/pokedex.command';
+import { PokepyonCommand } from './commands/pokedex.command';
 import { QuestionsService } from './questions.service';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class PokedexService {
   ) {}
 
   async pokedexCommand(message: Message) {
-    const command = new PokedexCommand(message);
+    const command = new PokepyonCommand(message);
     const user = await this.upsertUser(command);
 
     const activeQuestions = await this.getActiveQuestions(user);
@@ -39,7 +39,7 @@ export class PokedexService {
     return activeQuestions;
   }
 
-  private async upsertUser(command: PokedexCommand) {
+  private async upsertUser(command: PokepyonCommand) {
     const { userId, guildId } = command;
     const user = await this.usersRepository.findOne({
       where: {
