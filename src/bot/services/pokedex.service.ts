@@ -6,6 +6,7 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { pokedexReplies } from '../replies/pokedex.replies';
 import { RandomReply } from '../util/random-message.util';
+import { today } from '../util/today-util';
 import { PokepyonCommand } from './commands/pokedex.command';
 import { QuestionsService } from './questions.service';
 
@@ -27,10 +28,10 @@ export class PokedexService {
       return new RandomReply(pokedexReplies).finalMessage;
 
     const lastAsked = user.askedOn;
-    const lastAskedDate = new Date(lastAsked.toString());
-    const userPlayedToday = this.isToday(lastAskedDate);
-    console.log(userPlayedToday);
-    if (userPlayedToday) return 'Eeh ya habias jugado hoy.';
+    if (!!lastAsked) {
+      const userPlayedToday = today() === lastAsked;
+      if (userPlayedToday) return 'Eeh ya habias jugado hoy.';
+    }
 
     return await this.questionsService.getQuestion(user);
   }
@@ -64,14 +65,5 @@ export class PokedexService {
       return await this.usersRepository.save(newUser);
     }
     return user;
-  }
-
-  private isToday(someDate: Date) {
-    const today = new Date();
-    return (
-      someDate.getUTCDate() === today.getUTCDate() &&
-      someDate.getMonth() === today.getMonth() &&
-      someDate.getFullYear() === today.getFullYear()
-    );
   }
 }

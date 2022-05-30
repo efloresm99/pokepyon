@@ -26,7 +26,7 @@ export class User {
   totalPoints: number;
 
   @Column('date', { nullable: true })
-  askedOn: Date;
+  askedOn: string;
 
   @OneToMany(() => Purchase, (purchase) => purchase.user)
   purchases: Purchase[];

@@ -39,8 +39,8 @@ export class BotGateway {
     if (responseString) return response;
 
     return {
-      files: [{ attachment: response, name: 'pokemon.png' }],
-      content: `Esooo!!! has acertado! ganas`,
+      files: [{ attachment: response.attachment, name: 'pokemon.png' }],
+      content: response.content,
       nonce: message.nonce,
     };
   }
