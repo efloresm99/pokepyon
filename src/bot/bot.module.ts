@@ -7,6 +7,7 @@ import { Question } from 'src/entities/question.entity';
 import { Store } from 'src/entities/store.entity';
 import { User } from 'src/entities/user.entity';
 import { BotGateway } from './bot.gateway';
+import { GuessService } from './services/guess.service';
 import { PokedexService } from './services/pokedex.service';
 import { QuestionsService } from './services/questions.service';
 
@@ -15,6 +16,6 @@ import { QuestionsService } from './services/questions.service';
     DiscordModule.forFeature(),
     TypeOrmModule.forFeature([Hint, Purchase, Question, Store, User]),
   ],
-  providers: [BotGateway, PokedexService, QuestionsService],
+  providers: [BotGateway, PokedexService, QuestionsService, GuessService],
 })
 export class BotModule {}

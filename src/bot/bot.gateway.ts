@@ -1,6 +1,7 @@
 import { InjectDiscordClient, Once, PrefixCommand } from '@discord-nestjs/core';
 import { Injectable, Logger } from '@nestjs/common';
 import { Client, Message } from 'discord.js';
+import { GuessService } from './services/guess.service';
 import { PokedexService } from './services/pokedex.service';
 
 @Injectable()
@@ -10,6 +11,7 @@ export class BotGateway {
   constructor(
     @InjectDiscordClient() private readonly client: Client,
     private readonly pokedexService: PokedexService,
+    private readonly guessService: GuessService,
   ) {}
 
   @Once('ready')
@@ -26,6 +28,19 @@ export class BotGateway {
     return {
       files: [{ attachment: response, name: 'pokemon.png' }],
       content: `Oye, ${message.author}, dime ¿Cuál es este pokemon?`,
+      nonce: message.nonce,
+    };
+  }
+
+  @PrefixCommand('pokemon')
+  async onGuess(message: Message) {
+    const response = await this.guessService.guessPokemon(message);
+    const responseString = typeof response === 'string';
+    if (responseString) return response;
+
+    return {
+      files: [{ attachment: response.attachment, name: 'pokemon.png' }],
+      content: response.content,
       nonce: message.nonce,
     };
   }
