@@ -6,7 +6,6 @@ import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import { pokedexReplies } from '../replies/pokedex.replies';
 import { RandomReply } from '../util/random-message.util';
-import { today } from '../util/today-util';
 import { PokepyonCommand } from './commands/pokedex.command';
 import { QuestionsService } from './questions.service';
 
@@ -26,12 +25,6 @@ export class PokedexService {
     const userHasUnansweredQuestion = !!activeQuestions;
     if (userHasUnansweredQuestion)
       return new RandomReply(pokedexReplies).finalMessage;
-
-    const lastAsked = user.askedOn;
-    if (!!lastAsked) {
-      const userPlayedToday = today() === lastAsked;
-      if (userPlayedToday) return 'Eeh ya habias jugado hoy.';
-    }
 
     return await this.questionsService.getQuestion(user);
   }

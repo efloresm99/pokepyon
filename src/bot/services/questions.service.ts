@@ -11,8 +11,6 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionsService {
-  user: User;
-
   constructor(
     @InjectRepository(Question)
     private questionsRepository: Repository<Question>,
@@ -21,8 +19,10 @@ export class QuestionsService {
   ) {}
 
   async getQuestion(user: User) {
-    this.user = user;
-    const randomId = Math.ceil(Math.random() * 125);
+    const ceilPokedex = parseInt(process.env.POKEDEX_CEIL);
+    const randomA = Math.ceil(Math.random() * (ceilPokedex / 2));
+    const randomB = Math.ceil(Math.random() * (ceilPokedex / 2) - 1);
+    const randomId = randomA + randomB;
 
     const pokeApi = require('pokeapi-typescript');
     const pokemon: IPokemon = await pokeApi.Pokemon.resolve(randomId);
@@ -36,6 +36,7 @@ export class QuestionsService {
       pokemonType,
       pokemonMove,
       pokeImageUrl,
+      user,
     );
     return pokemonImage;
   }
@@ -87,9 +88,10 @@ export class QuestionsService {
     pokemonType: string,
     pokemonMove: string,
     imageUrl: string,
+    user: User,
   ) {
     const question = this.questionsRepository.create({
-      user: this.user,
+      user: user,
       currentHint: 0,
       answer: pokemonName,
       imageUrl,
