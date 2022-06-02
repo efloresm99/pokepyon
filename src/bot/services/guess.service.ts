@@ -7,6 +7,7 @@ import { Question } from 'src/entities/question.entity';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import {
+  pokemonCorrect,
   pokemonIncorrect,
   pokemonNotPlayingReplies,
   pokemonNotWellFormatted,
@@ -16,7 +17,6 @@ import { PokepyonCommand } from './commands/pokedex.command';
 import { QuestionsService } from './questions.service';
 import { firstUpper } from '../util/first-upper.util';
 import { Hint } from 'src/entities/hint.entity';
-import { today } from '../util/today-util';
 
 @Injectable()
 export class GuessService {
@@ -45,31 +45,22 @@ export class GuessService {
       return new RandomReply(pokemonNotWellFormatted).finalMessage;
 
     const guess = content.toLowerCase();
-    const question = await this.questionsRepository.find({
+    const question = await this.questionsRepository.findOne({
       where: {
         user,
         answer: guess,
       },
     });
-    if (!question.length) {
+    if (!question) {
       const question = await this.questionsRepository.findOne({
         where: {
           user,
         },
       });
-      const { answer } = question;
-      const randomReply = `${
-        new RandomReply(pokemonIncorrect).finalMessage
-      } La respuesta era: **${firstUpper(answer)}**!!`;
-      const pokemonRevealed = await this.getPokemonImage(question.imageUrl);
-      await this.hintsRepository.delete({ question });
-      await this.questionsRepository.delete({ user });
-      user.askedOn = today();
-      await this.usersRepository.save(user);
-      return { content: randomReply, attachment: pokemonRevealed };
+      return await this.getReply(question, user, false);
     }
 
-    return 'ahuevos';
+    return await this.getReply(question, user);
   }
 
   private validateContent(content: string) {
@@ -102,5 +93,24 @@ export class GuessService {
       .composite([{ input: processedImage, top: 40, left: 40 }])
       .toBuffer();
     return finalImage;
+  }
+
+  private async getReply(question: Question, user: User, success = true) {
+    const { answer } = question;
+    const pokemonRevealed = await this.getPokemonImage(question.imageUrl);
+    await this.hintsRepository.delete({ question });
+    await this.questionsRepository.delete({ user });
+
+    if (!success) {
+      const randomReply = `${
+        new RandomReply(pokemonIncorrect).finalMessage
+      } La respuesta era: **${firstUpper(answer)}**!!`;
+      return { content: randomReply, attachment: pokemonRevealed };
+    }
+
+    const randomReply = `${
+      new RandomReply(pokemonCorrect).finalMessage
+    } La respuesta es: **${firstUpper(answer)}**!!`;
+    return { content: randomReply, attachment: pokemonRevealed };
   }
 }
